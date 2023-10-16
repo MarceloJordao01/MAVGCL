@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.comino</groupId>
 	<artifactId>MAVGCL</artifactId>
-	<version>0.8.0</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 	<name>MAVGCL2</name>
 	<repositories>
@@ -164,10 +164,28 @@
 			<artifactId>fxyz3d</artifactId>
 			<version>0.5.4</version>
 		</dependency>
+
+
+		<!-- dependencias faltando no projeto original -->
+		<!-- https://mvnrepository.com/artifact/org.georegression/georegression -->
+		<dependency>
+			<groupId>org.georegression</groupId>
+			<artifactId>georegression</artifactId>
+			<version>0.26.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.boofcv/boofcv-geo -->
+		<dependency>
+			<groupId>org.boofcv</groupId>
+			<artifactId>boofcv-geo</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.bytedeco</groupId>
 			<artifactId>javacv</artifactId>
-			<version>1.5.9-SNAPSHOT</version>
+			<version>1.5.9</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
@@ -238,7 +256,7 @@
 		<dependency>
 			<groupId>org.bytedeco</groupId>
 			<artifactId>javacv-platform</artifactId>
-			<version>1.5.9-SNAPSHOT</version>
+			<version>1.5.9</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.bytedeco</groupId>
@@ -330,6 +348,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.6.0</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
