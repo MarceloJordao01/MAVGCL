@@ -44,13 +44,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import org.mavlink.generator.MAVLinkMessage;
 import org.mavlink.messages.MAV_CMD;
 import org.mavlink.messages.MAV_SEVERITY;
 import org.mavlink.messages.MSP_CMD;
+import org.mavlink.messages.lquac.msg_autopilot_version;
 import org.mavlink.messages.lquac.msg_log_erase;
 import org.mavlink.messages.lquac.msg_msp_command;
 
 import com.comino.flight.file.MAVFTPClient;
+import com.comino.flight.events.MAVEventMataData;
 import com.comino.flight.file.FileHandler;
 import com.comino.flight.log.ulog.MavLinkULOGHandler;
 import com.comino.flight.model.map.MAVGCLMap;
@@ -333,6 +336,7 @@ public class MainApp extends Application  {
 
 			System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
 
+			MAVEventMataData.getInstance( );
 
 			MAVPreferences.init();
 			MAVGCLMap.getInstance(control);
@@ -353,7 +357,7 @@ public class MainApp extends Application  {
 					wq.addSingleTask("LP",500, () -> {			
 						System.out.println("Is simulation: "+control.isSimulation());
 						//	control.getStatusManager().reset();
-						control.sendMAVLinkCmd(MAV_CMD.MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES, 1);
+						control.sendMAVLinkCmd(MAV_CMD.MAV_CMD_REQUEST_MESSAGE, msg_autopilot_version.MAVLINK_MSG_ID_AUTOPILOT_VERSION);
 						if(!control.getCurrentModel().sys.isStatus(Status.MSP_INAIR) && control.getCurrentModel().sys.isStatus(Status.MSP_ACTIVE)) {
 							control.sendMSPLinkCmd(MSP_CMD.MSP_TRANSFER_MICROSLAM);
 							MSPLogger.getInstance().writeLocalMsg("[mgc] grid data requested",MAV_SEVERITY.MAV_SEVERITY_NOTICE);
@@ -584,11 +588,11 @@ public class MainApp extends Application  {
 		version_txt.append(" (Cycle: "+AnalysisModelService.getInstance().getCollectorInterval_ms()+"ms)");
 
 		version.setText(version_txt.toString());
-
+		Label connect = new Label("  Connected to "+control.getConnectedAddress());
 		version.setPadding(new Insets(10,0,0,0));
 		Label source = new Label("  Source, license and terms of use: https://github.com/ecmnet/MAVGCL");
 		Label copyright = new Label("  ecm@gmx.de");
-		box.getChildren().addAll(splash, version, source, copyright);
+		box.getChildren().addAll(splash, version, connect,source, copyright);
 		box.autosize();
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("About MAVGAnalysis");
@@ -703,7 +707,10 @@ public class MainApp extends Application  {
 				Optional<ButtonType> result = alert.showAndWait();
 
 				if (result.get() == ButtonType.OK) {
-					control.sendMAVLinkMessage(new msg_log_erase(1,2));
+					msg_log_erase msg = new msg_log_erase(1,2);
+					msg.target_component = 1;
+					msg.target_system    = 1;
+					control.sendMAVLinkMessage(msg);
 					MSPLogger.getInstance().writeLocalMsg("[mgc] All PX4 logs have been erased",
 							MAV_SEVERITY.MAV_SEVERITY_NOTICE);
 				}
