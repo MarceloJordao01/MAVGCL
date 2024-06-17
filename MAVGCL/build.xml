@@ -1,6 +1,6 @@
 <project name="MAVGAnalysis" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 
-	<property name="workspace.dir" value="/Users/ecmnet/PixHawk/java/" />
+	<property name="workspace.dir" value="/home" />
 
 	<target name="metadata">
 		<tstamp>
@@ -16,142 +16,73 @@
 
 	<target name="utils" depends="metadata">
 
-		<exec dir="${workspace.dir}/MAVUtils/mavutils" executable="sh">
-			<env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk-21.0.1.jdk/Contents/home" />
-			<arg line="-c '/usr/local/Cellar/maven/3.9.2/bin/mvn clean install -amd'" />
+		<exec dir="${workspace.dir}/mavutils/mavutils" executable="sh">
+			<env key="JAVA_HOME" path="/usr/local/jdk/jdk-21.0.3" />
+			<arg line="-c '/usr/local/maven/apache-maven-3.9.2/bin/mvn clean install -amd'" />
 		</exec>
-
 	</target>
 
-	<target name="com" depends="utils">
-
-		<exec dir="${workspace.dir}/MAVCom/mavcom" executable="sh">
-			<env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk-21.0.1.jdk/Contents/home" />
-			<arg line="-c '/usr/local/Cellar/maven/3.9.2/bin/mvn clean install -amd'" />
-		</exec>
-
-		<exec dir="${workspace.dir}/MAVMap/mavmap" executable="sh">
-			<env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk-21.0.1.jdk/Contents/home" />
-			<arg line="-c '/usr/local/Cellar/maven/3.9.2/bin/mvn clean install -amd'" />
-		</exec>
-
+	<target name="copy_utils" depends="utils">
+		<copy file="${workspace.dir}/mavutils/mavutils/target/mavutils-0.0.1.jar" todir="${workspace.dir}/MAVGCL/MAVGCL/lib"/>
+		<copy file="${workspace.dir}/mavutils/mavutils/target/mavutils-0.0.1.jar" todir="${workspace.dir}/mavcom/mavcom/lib"/>
+		<copy file="${workspace.dir}/mavutils/mavutils/target/mavutils-0.0.1.jar" todir="${workspace.dir}/mavmap/mavmap/lib"/>		
+		<copy file="${workspace.dir}/mavutils/mavutils/target/mavutils-0.0.1.jar" todir="${workspace.dir}/MAVBase/MAVBase/lib"/>
 	</target>
 
-	<target name="mvn_osx" depends="com">
+	<target name="com" depends="copy_utils">
+		<exec dir="${workspace.dir}/mavcom/mavcom" executable="sh">
+			<env key="JAVA_HOME" path="/usr/local/jdk/jdk-21.0.3" />
+			<arg line="/usr/local/maven/apache-maven-3.9.2/bin/mvn clean install -amd" />
+		</exec>
+	</target>
+
+	<target name="copy_com" depends="com">
+		<copy file="${workspace.dir}/mavcom/mavcom/target/mavcom-0.0.1.jar" todir="${workspace.dir}/MAVGCL/MAVGCL/lib"/>
+		<copy file="${workspace.dir}/mavcom/mavcom/target/mavcom-0.0.1.jar" todir="${workspace.dir}/mavmap/mavmap/lib"/>		
+		<copy file="${workspace.dir}/mavcom/mavcom/target/mavcom-0.0.1.jar" todir="${workspace.dir}/MAVBase/MAVBase/lib"/>
+	</target>
+
+
+	<target name="map" depends="copy_com">
+		<exec dir="${workspace.dir}/mavmap/mavmap" executable="sh">
+			<env key="JAVA_HOME" path="/usr/local/jdk/jdk-21.0.3" />
+			<arg line="/usr/local/maven/apache-maven-3.9.2/bin/mvn clean install -amd" />
+		</exec>
+	</target>
+
+	<target name="copy_map" depends="map">
+		<copy file="${workspace.dir}/mavmap/mavmap/target/mavmap-0.0.1.jar" todir="${workspace.dir}/MAVGCL/MAVGCL/lib"/>		
+		<copy file="${workspace.dir}/mavmap/mavmap/target/mavmap-0.0.1.jar" todir="${workspace.dir}/MAVBase/MAVBase/lib"/>
+	</target>
+
+	<target name="base" depends="copy_map">
+		<exec dir="${workspace.dir}/MAVBase/MAVBase" executable="sh">
+			<env key="JAVA_HOME" path="/usr/local/jdk/jdk-10.0.1" />
+			<arg line="/usr/local/maven/apache-maven-3.8.6/bin/mvn clean install -amd" />
+		</exec>
+	</target>
+
+	<target name="copy_base" depends="base">
+		<copy file="${workspace.dir}/MAVBase/MAVBase/target/MAVBase-0.0.1.jar" todir="${workspace.dir}/MAVGCL/MAVGCL/lib"/>		
+	</target>
+	
+
+	<target name="mvn_linux" depends="copy_base">
 		<exec dir="./" executable="sh">
-			<env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk-21.0.1.jdk/Contents/home" />
-			<arg line="-c ' /usr/local/Cellar/maven/3.9.2/bin/mvn clean install -amd -Djavacpp.platform=macosx-x86_64'" />
+			<env key="JAVA_HOME" path="/usr/local/jdk/jdk-21.0.3" />
+			<arg line="/usr/local/maven/apache-maven-3.9.2/bin/mvn clean install -amd -Djavacpp.platform=linux-x86_64" />
 		</exec>
 	</target>
 
-	<target name="mvn_osx_arm" depends="com">
-		<exec dir="./" executable="sh">
-			<env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk-21.0.1.jdk/Contents/home" />
-			<arg line="-c ' /usr/local/Cellar/maven/3.9.2/bin/mvn clean install -amd -Djavacpp.platform=macosx-arm64'" />
-		</exec>
-	</target>
-
-	<target name="mvn_win" depends="com">
-		<exec dir="./" executable="sh">
-			<env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk-21.0.1.jdk/Contents/home" />
-			<arg line="-c ' /usr/local/Cellar/maven/3.9.2/bin/mvn clean install -amd -Djavacpp.platform=windows-x86_64'" />
-		</exec>
-	</target>
-
-	<target name="mvn_linux" depends="com">
-		<exec dir="./" executable="sh">
-			<env key="JAVA_HOME" path="/Library/Java/JavaVirtualMachines/jdk-21.0.1.jdk/Contents/home" />
-			<arg line="-c ' /usr/local/Cellar/maven/3.9.2/bin/mvn clean install -amd -Djavacpp.platform=linux-x86_64'" />
-		</exec>
-	</target>
-
-	<target name="deploy_osx_17" depends="mvn_osx">
-		<echo>Deploying MAVGCL...</echo>
-		<exec dir="./" executable="sh">
-			<arg line="-c './package.sh'" />
-		</exec>
-	</target>
-
-	<target name="deploy_osx_17_arm" depends="mvn_osx_arm">
-		<echo>Deploying MAVGCL...</echo>
-		<exec dir="./" executable="sh">
-			<arg line="-c './package_arm64.sh'" />
-		</exec>
-	</target>
-
-	<target name="deploy_osx_17_x86" depends="mvn_osx_arm">
-		<echo>Deploying MAVGCL...</echo>
-		<exec dir="./" executable="sh">
-			<arg line="-c './package_x86_64.sh'" />
-		</exec>
-	</target>
-
-	<target name="deploy_windows_17" depends="mvn_win">
-		<echo>Deploying MAVGCL...</echo>
-		<exec dir="./" executable="sh">
-			<arg line="-c './package_windows.sh'" />
-		</exec>
-	</target>
 
 	<target name="deploy_linux_17" depends="mvn_linux">
 		<echo>Deploy JDk17 Version</echo>
-		<exec dir="./" executable="sh">
-			<arg line="-c './package_linux.sh'" />
-		</exec>
+		<!-- <env key="JAVA_HOME" path="/usr/local/jdk/jdk-14.0.2" />
+		<env key="PATH" path="$PATH:$JAVA_HOME/bin" /> -->
+		<exec executable="/bin/bash" dir="${workspace.dir}">
+            <arg value="/home/MAVGCL/MAVGCL/package_linux.sh"/>
+        </exec>
 	</target>
 
-	<!--
-	<target name="deploy_osx" depends="mvn">
-		<fx:deploy width="1230" height="865" outdir="dist/deploy" outfile="MAVGAnalysis" nativeBundles="dmg">
-			<fx:application name="MAVGAnalysis" mainClass="com.comino.flight.MainApp" version="0.8">
-			</fx:application>
-			<fx:resources>
-				<fx:fileset requiredFor="startup"   dir="target/deploy" includes="*.*" />
-			</fx:resources>
-			<fx:info title="MAVGAnalysis" vendor="ecmnet">
-				<fx:icon href="MAVGAnalysis.icns" />
-				<fx:association extension="mgc" description="*.mgc files"/>
-			</fx:info>
-			<fx:platform>
-				<fx:jvmarg value="-Xms4G"/>
-				<fx:jvmarg value="-XX:MaxGCPauseMillis=10"/>
-			</fx:platform>
-		</fx:deploy>
-	</target>
-
-
-	<target name="deploy_linux" depends="mvn">
-		<fx:deploy width="1230" height="865" outdir="dist/deploy" outfile="MAVGAnalysis" nativeBundles="deb">
-			<fx:application name="MAVGAnalysis" mainClass="com.comino.flight.MainApp" version="0.8">
-			</fx:application>
-			<fx:resources>
-				<fx:fileset requiredFor="startup"   dir="dist" includes="*.*" />
-			</fx:resources>
-			<fx:info title="MAVGAnalysis" vendor="ecmnet">
-			</fx:info>
-			<fx:platform>
-				<fx:jvmarg value="-Xms1G"/>
-				
-			</fx:platform>
-		</fx:deploy>
-	</target>
-
-
-	<target name="deploy_windows" depends="mvn">
-		<fx:deploy width="1230" height="865" outdir="dist/deploy" outfile="MAVGAnalysis" nativeBundles="msi">
-			<fx:application name="MAVGAnalysis" mainClass="com.comino.flight.MainApp" version="0.8">
-
-			</fx:application>
-			<fx:resources>
-				<fx:fileset requiredFor="startup"   dir="dist" includes="*.*" />
-			</fx:resources>
-			<fx:info title="MAVGAnalysis" vendor="ecmnet">
-				<fx:icon href="MAVGAnalysis.icns" />
-			</fx:info>
-			<fx:platform>
-				<fx:jvmarg value="-Xms1G"/>
-			</fx:platform>
-		</fx:deploy>
-	</target>
--->
+	
 </project>

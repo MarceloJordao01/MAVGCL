@@ -245,7 +245,7 @@ public class MainApp extends Application  {
 			Logger.getLogger("javafx.scene.image").setLevel(Level.SEVERE);
 
 			System.out.println("Initializing application ( Java: "+Runtime.version()+")"+" "+System.getProperty("java.vm.vendor")+
-					" JavaFX runtime "+com.sun.javafx.runtime.VersionInfo.getRuntimeVersion()+
+					" JavaFX runtime "+System.getProperty("java.version")+
 					" build on BoofCV "+BoofVersion.VERSION); 
 
 			ExecutorService.create();
@@ -334,7 +334,7 @@ public class MainApp extends Application  {
 				}
 			});
 
-			System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
+			System.out.println(System.getProperty("java.version"));
 
 			MAVEventMataData.getInstance( );
 
@@ -584,7 +584,7 @@ public class MainApp extends Application  {
 			version_txt.append("  MSP build: " + Status.build);
 		version_txt.append("  MAVGCL ("+getBuildInfo().getProperty("build")+")");
 		version_txt.append(" runs on Java "+Runtime.version());
-		version_txt.append("/"+com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
+		version_txt.append("/"+System.getProperty("java.version"));
 		version_txt.append(" (Cycle: "+AnalysisModelService.getInstance().getCollectorInterval_ms()+"ms)");
 
 		version.setText(version_txt.toString());
